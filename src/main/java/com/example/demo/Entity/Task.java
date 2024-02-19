@@ -2,6 +2,7 @@ package com.example.demo.Entity;
 
 import com.example.demo.Entity.Enums.Status;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -38,7 +39,8 @@ public class Task {
 
     //Check if null
     //Check if date is valid (due date in the futur)
-    @Column(name = "due_date",nullable = false)
+    @NotNull(message = "test")
+    @Column(name = "due_date", nullable = false)
     private Date dueDate;
 
 
@@ -50,6 +52,6 @@ public class Task {
     @UpdateTimestamp
     private Date updatedAt;
 
-    @ManyToOne( fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY)
     private User user;
 }

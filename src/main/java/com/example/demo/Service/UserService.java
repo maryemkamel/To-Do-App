@@ -6,6 +6,7 @@ import com.example.demo.Entity.Enums.Status;
 import com.example.demo.Entity.User;
 import com.example.demo.Repository.UserRepo;
 import com.example.demo.Utils.MappingProfile;
+import com.example.demo.exception.UserNotFound;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -25,6 +26,7 @@ public class UserService {
     }
 
     public UserResponseDto createUser(UserRequestDto userDto) {
+
         if (!userDto.isValidEmail(userDto.getEmail())) {
             throw new IllegalArgumentException("Invalid email address");
         }
@@ -32,8 +34,8 @@ public class UserService {
         return MappingProfile.mapToUserDto(userRepo.save(user));
     }
 
-    public Object getUserById(Long id) throws Exception {
-        var user = userRepo.findById(id).orElseThrow(() -> new Exception("User not found"));
+    public Object getUserById(Long id) throws UserNotFound {
+        var user = userRepo.findById(id).orElseThrow(UserNotFound::new);
         return new Object(){
             public Long id = user.getId();
             public String fullName = user.getLastName().toUpperCase() + ", " + user.getFirstName();
@@ -64,8 +66,8 @@ public class UserService {
         return MappingProfile.mapToUserDto(userRepo.save(user));
     }
 
-    public void deleteUser(Long id) throws Exception {
-        var user = userRepo.findById(id).orElseThrow(() -> new Exception("User not found"));
+    public void deleteUser(Long id) throws UserNotFound{
+        var user = userRepo.findById(id).orElseThrow(UserNotFound::new);
         userRepo.delete(user);
     }
 

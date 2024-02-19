@@ -3,6 +3,7 @@ package com.example.demo.Controller;
 import com.example.demo.Entity.DTO.UserRequestDto;
 import com.example.demo.Entity.DTO.UserResponseDto;
 import com.example.demo.Service.UserService;
+import com.example.demo.exception.UserNotFound;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,7 +22,7 @@ public class UserController {
 
     @PostMapping("/create")
     public ResponseEntity<?> createUser(@RequestBody UserRequestDto userDto) {
-        try {
+        try { // Validation with Function interface
             // Call the createUser method in the service
             return new ResponseEntity<>(userService.createUser(userDto), HttpStatus.CREATED);
         } catch (IllegalArgumentException e) {
@@ -34,9 +35,16 @@ public class UserController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<?> getUserById( @PathVariable Long id) throws Exception {
+    public ResponseEntity<?> getUserById( @PathVariable Long id) throws UserNotFound {
 
-        return new ResponseEntity<>(userService.getUserById(id), HttpStatus.OK);
+        try {
+            return new ResponseEntity<>(userService.getUserById(id),HttpStatus.OK);
+        } catch (UserNotFound e) {
+            return new ResponseEntity<>("User Not Found!",HttpStatus.NOT_FOUND);
+        } catch (Exception e) {
+
+            throw new RuntimeException(e);
+        }
 
     }
     @PutMapping("/{id}")
@@ -49,16 +57,14 @@ public class UserController {
         }
     }
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> deleteUser(@PathVariable Long id) {
+    public String deleteUser(@PathVariable Long id) throws UserNotFound {
         try {
             userService.deleteUser(id);
-            return ResponseEntity.ok("User with ID " + id + " deleted successfully");
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("Une erreur est survenue lors de la suppression de l'utilisateur.");
+            return "User id: "+id+" deleted!";
+        } catch (UserNotFound e) {
+            return "\nUser Not Found!";
         }
     }
-
 
 
 

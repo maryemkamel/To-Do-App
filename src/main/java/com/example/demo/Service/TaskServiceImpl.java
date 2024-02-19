@@ -5,6 +5,7 @@ import com.example.demo.Entity.DTO.TaskResponseDto;
 import com.example.demo.Entity.Enums.Status;
 import com.example.demo.Repository.TaskRepo;
 import com.example.demo.Utils.MappingProfile;
+import com.example.demo.exception.TaskNotFound;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import java.util.List;
@@ -32,8 +33,8 @@ public class TaskServiceImpl implements TaskService{
     }
 
     @Override
-    public TaskResponseDto getTaskById(Long id) throws Exception {
-        var task = taskRepo.findById(id).orElseThrow(() -> new Exception("Task not found"));
+    public TaskResponseDto getTaskById(Long id) throws TaskNotFound {
+        var task = taskRepo.findById(id).orElseThrow(TaskNotFound::new);
         return MappingProfile.mapToDto(task);
     }
 
@@ -42,7 +43,6 @@ public class TaskServiceImpl implements TaskService{
         var task = taskRepo.findById(id).orElseThrow(() -> new Exception("Task not found"));
         task.setTitle(taskDto.getTitle());
         task.setDescription(taskDto.getDescription());
-        task.setId(taskDto.getId());
         Status status = Status.valueOf(taskDto.getStatus());
         task.setStatus(status);
         task.setDueDate(task.getDueDate());

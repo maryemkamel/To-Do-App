@@ -5,6 +5,7 @@ import com.example.demo.Entity.DTO.TaskResponseDto;
 import com.example.demo.Entity.DTO.UserRequestDto;
 import com.example.demo.Entity.DTO.UserResponseDto;
 import com.example.demo.Service.TaskService;
+import com.example.demo.exception.TaskNotFound;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -29,6 +30,7 @@ public class TaskController {
     @PostMapping("/create")
     public ResponseEntity<?> addTask(@RequestBody TaskRequestDto taskDto) {
         try {
+            taskService.createTask(taskDto);
             return ResponseEntity.ok("Task added successfully");
         } catch (IllegalArgumentException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
@@ -40,9 +42,17 @@ public class TaskController {
 
 
     @GetMapping("/{id}")
-    public ResponseEntity<?> getTaskById( @PathVariable Long id) throws Exception {
+    public ResponseEntity<?> getTaskById( @PathVariable Long id) throws TaskNotFound {
 
-        return new ResponseEntity<>(taskService.getTaskById(id), HttpStatus.OK);
+        try {
+            return new ResponseEntity<>(taskService.getTaskById(id), HttpStatus.OK);
+
+        }catch (TaskNotFound e){
+            return new ResponseEntity<>("Task not found",HttpStatus.NOT_FOUND);
+        }
+        catch (Exception e){
+            throw new RuntimeException(e);
+        }
 
     }
     @PutMapping("/{id}")
